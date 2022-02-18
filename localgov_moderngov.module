@@ -8,9 +8,9 @@
 declare(strict_types = 1);
 
 use Drupal\localgov_moderngov\Constants;
- 
+
 /**
- * Implements hook_theme.
+ * Implements hook_theme().
  *
  * Themes:
  * - ModernGov template page.

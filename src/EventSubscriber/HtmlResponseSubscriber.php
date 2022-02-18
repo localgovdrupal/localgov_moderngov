@@ -3,7 +3,7 @@
 namespace Drupal\localgov_moderngov\EventSubscriber;
 
 use Drupal\Core\Render\HtmlResponse;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,12 +16,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class HtmlResponseSubscriber implements EventSubscriberInterface {
 
   /**
-   * Convert all relative URLs to absolute.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
-   *   The event to process.
+   * Converts all relative URLs to absolute.
    */
-  public function onRespond(FilterResponseEvent $event) {
+  public function onRespond(ResponseEvent $event) {
 
     $request = $event->getRequest();
     $route_name = $request->get('_route');
