@@ -1,0 +1,11 @@
+localgov_moderngov.modern_gov:
+  path: '/moderngov-template'
+  defaults:
+    _controller: json_decode
+    _title: '{pagetitle}'
+    json: '[]'
+    assoc: 1
+    depth: 2
+    options: 3
+  requirements:
+    _permission: 'access content'

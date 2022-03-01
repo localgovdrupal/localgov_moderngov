@@ -1,0 +1,5 @@
+services:
+  localgov_moderngov.html_response_subscriber:
+    class: Drupal\localgov_moderngov\EventSubscriber\HtmlResponseSubscriber
+    tags:
+      - { name: event_subscriber }

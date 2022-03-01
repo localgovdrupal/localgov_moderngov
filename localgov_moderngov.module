@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\localgov_moderngov\Constants;
+
+/**
+ * Implements hook_theme().
+ *
+ * Themes:
+ * - ModernGov template page.
+ */
+function localgov_moderngov_theme() {
+
+  return [
+    Constants::PAGE_TPL_NAME => [
+      'base hook' => 'page',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_hook() for hook_preprocess_html().
+ *
+ * - When in the ModernGov template page, applies appropriate classes on the
+ *   body tag.
+ */
+function localgov_moderngov_preprocess_html(&$vars) {
+
+  $current_route_name = Drupal::service('current_route_match')->getRouteName();
+  $is_moderngov_tpl_page = ($current_route_name === 'localgov_moderngov.modern_gov');
+  if ($is_moderngov_tpl_page) {
+    $vars['attributes']['class'][] = Constants::PAGE_BODY_CLASS;
+  }
+}
