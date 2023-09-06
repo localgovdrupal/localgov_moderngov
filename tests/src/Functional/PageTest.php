@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\localgov_moderngov\Functional;
 
-use Drupal\user\Entity\Role;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
+use Drupal\user\Entity\Role;
 
 /**
  * Modern.Gov template page examination.
