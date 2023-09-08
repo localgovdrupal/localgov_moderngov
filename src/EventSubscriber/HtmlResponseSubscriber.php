@@ -3,9 +3,9 @@
 namespace Drupal\localgov_moderngov\EventSubscriber;
 
 use Drupal\Core\Render\HtmlResponse;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Post processing for the ModernGov template page.
