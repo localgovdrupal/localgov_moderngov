@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * Processing:
  * - Converts all relative URLs in the page to absolute URLs.
+ * - Empties the main tag when the `nocontent` HTTP query parameter is present.
  */
 class HtmlResponseSubscriber implements EventSubscriberInterface {
 
@@ -23,15 +24,23 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
     $request = $event->getRequest();
     $route_name = $request->get('_route');
     $response = $event->getResponse();
+
     if (!$response instanceof HtmlResponse || $route_name !== 'localgov_moderngov.modern_gov') {
       return;
     }
 
-    $request_scheme_and_host = $request->getSchemeAndHttpHost();
-
     $html = $response->getContent();
-    $html_with_absolute_urls = self::transformRootRelativeUrlsToAbsolute($html, $request_scheme_and_host);
+    $html_dom = self::toDom($html);
 
+    $request_scheme_and_host = $request->getSchemeAndHttpHost();
+    $html_dom_with_absolute_urls = self::transformRootRelativeUrlsToAbsolute($html_dom, $request_scheme_and_host);
+
+    $has_content_modifier_req = $request->get('nocontent');
+    if ($has_content_modifier_req) {
+      $html_dom_with_absolute_urls = self::emptyContent($html_dom_with_absolute_urls);
+    }
+
+    $html_with_absolute_urls = self::toHtml($html_dom_with_absolute_urls);
     $response->setContent($html_with_absolute_urls);
   }
 
@@ -43,7 +52,7 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    * which processes Html *body* content only.  Whereas here, we process the
    * entire HTML document.
    *
-   * @param string $html
+   * @param \DOMDocument $html_dom
    *   The partial (X)HTML snippet to load. Invalid markup will be corrected on
    *   import.
    * @param string $scheme_and_host
@@ -54,11 +63,8 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    *
    * @see Drupal\Component\Utility\Html::transformRootRelativeUrlsToAbsolute()
    */
-  public static function transformRootRelativeUrlsToAbsolute($html, $scheme_and_host) :string {
+  public static function transformRootRelativeUrlsToAbsolute(\DOMDocument $html_dom, $scheme_and_host): \DOMDocument {
 
-    $html_dom = new \DOMDocument();
-    // Ignore warnings during HTML soup loading.
-    @$html_dom->loadHTML($html);
     $xpath = new \DOMXpath($html_dom);
 
     $uriAttributes = [
@@ -86,8 +92,57 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
       }
     }
 
-    $html_with_absolute_urls = $html_dom->saveHtml();
-    return $html_with_absolute_urls;
+    return $html_dom;
+  }
+
+  /**
+   * Empties page content.
+   *
+   * Note that "A document mustn't have more than one <main> element that
+   * doesn't have the hidden attribute specified."  In case of multiple
+   * visible main elements in a page, we empty only the very first one.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main#try_it
+   */
+  public static function emptyContent(\DOMDocument $html_dom) :\DOMDocument {
+
+    $main_elem_list = $html_dom->getElementsByTagName('main');
+    $visible_main_elem_list = array_filter(iterator_to_array($main_elem_list), fn(\DOMElement $elem) => !$elem->hasAttribute('hidden'));
+    if (empty($visible_main_elem_list)) {
+      return $html_dom;
+    }
+
+    $main_elem = current($visible_main_elem_list);
+    $mains_children = [];
+    foreach ($main_elem->childNodes as $child) {
+      $mains_children[] = $child;
+    }
+    foreach ($mains_children as $child) {
+      $main_elem->removeChild($child);
+    }
+
+    return $html_dom;
+  }
+
+  /**
+   * HTML string to DOM.
+   */
+  public static function toDom(string $html): \DOMDocument {
+
+    $html_dom = new \DOMDocument();
+    // Ignore warnings during HTML soup loading.
+    @$html_dom->loadHTML($html);
+
+    return $html_dom;
+  }
+
+  /**
+   * HTML DOM to string.
+   */
+  public static function toHtml(\DOMDocument $html_dom): string {
+
+    $html = $html_dom->saveHtml();
+    return $html;
   }
 
   /**
