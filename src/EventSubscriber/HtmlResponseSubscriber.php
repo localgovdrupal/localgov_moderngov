@@ -13,15 +13,28 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Processing:
  * - Converts all relative URLs in the page to absolute URLs.
  * - Empties the main tag when the `nocontent` HTTP query parameter is present.
+ * - Returns the `header` tag and its children when the `header` HTTP query
+ *   parameter is present.
+ * - Returns the `footer` tag and its children when the `footer` HTTP query
+ *   parameter is present.
+ *
+ * @todo Both the `header` and `footer` can happen more than once in a page.  At
+ *       the moment we only process the very first of these.  This needs fixing.
  */
 class HtmlResponseSubscriber implements EventSubscriberInterface {
 
   /**
-   * Converts all relative URLs to absolute.
+   * Alters browser-bound page content.
+   *
+   * Converts all relative URLs to absolute.  Then a few more alterations as
+   * mentioned in the class comment above.
    */
   public function onRespond(ResponseEvent $event) {
 
     $request = $event->getRequest();
+    $has_content_modifier_req = !is_null($request->get('nocontent'));
+    $has_header_req = !is_null($request->get('header'));
+    $has_footer_req = !is_null($request->get('footer'));
     $route_name = $request->get('_route');
     $response = $event->getResponse();
 
@@ -35,13 +48,23 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
     $request_scheme_and_host = $request->getSchemeAndHttpHost();
     $html_dom_with_absolute_urls = self::transformRootRelativeUrlsToAbsolute($html_dom, $request_scheme_and_host);
 
-    $has_content_modifier_req = $request->get('nocontent');
     if ($has_content_modifier_req) {
       $html_dom_with_absolute_urls = self::emptyContent($html_dom_with_absolute_urls);
     }
 
-    $html_with_absolute_urls = self::toHtml($html_dom_with_absolute_urls);
-    $response->setContent($html_with_absolute_urls);
+    if ($has_header_req) {
+      $header_elem_list = $html_dom_with_absolute_urls->getElementsByTagName('header');
+      $resultant_html = self::toHtml($html_dom_with_absolute_urls, $header_elem_list->item(0));
+    }
+    elseif ($has_footer_req) {
+      $footer_elem_list = $html_dom_with_absolute_urls->getElementsByTagName('footer');
+      $resultant_html = self::toHtml($html_dom_with_absolute_urls, $footer_elem_list->item(0));
+    }
+    else {
+      $resultant_html = self::toHtml($html_dom_with_absolute_urls);
+    }
+
+    $response->setContent($resultant_html);
   }
 
   /**
@@ -139,9 +162,9 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
   /**
    * HTML DOM to string.
    */
-  public static function toHtml(\DOMDocument $html_dom): string {
+  public static function toHtml(\DOMDocument $html_dom, ?\DOMNode $node = NULL): string {
 
-    $html = $html_dom->saveHtml();
+    $html = $html_dom->saveHtml($node);
     return $html;
   }
 
