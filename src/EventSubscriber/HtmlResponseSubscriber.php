@@ -3,6 +3,7 @@
 namespace Drupal\localgov_moderngov\EventSubscriber;
 
 use Drupal\Core\Render\HtmlResponse;
+use Drupal\localgov_moderngov\HeaderFooterExtraction;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -14,9 +15,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * - Converts all relative URLs in the page to absolute URLs.
  * - Empties the main tag when the `nocontent` HTTP query parameter is present.
  * - Returns the `header` tag and its children when the `header` HTTP query
- *   parameter is present.
+ *   parameter is present.  Preceeded by div containers whose children are
+ *   `script` and `link` tags that appear above the `header` tag in the page
+ *   markup.
  * - Returns the `footer` tag and its children when the `footer` HTTP query
- *   parameter is present.
+ *   parameter is present.  Followed by a div container whose children are
+ *   `script` tags that appear below the `footer` tag in the page markup.
  *
  * @todo Both the `header` and `footer` can happen more than once in a page.  At
  *       the moment we only process the very first of these.  This needs fixing.
@@ -53,12 +57,10 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
     }
 
     if ($has_header_req) {
-      $header_elem_list = $html_dom_with_absolute_urls->getElementsByTagName('header');
-      $resultant_html = self::toHtml($html_dom_with_absolute_urls, $header_elem_list->item(0));
+      $resultant_html = HeaderFooterExtraction::prepareHeader($html_dom_with_absolute_urls);
     }
     elseif ($has_footer_req) {
-      $footer_elem_list = $html_dom_with_absolute_urls->getElementsByTagName('footer');
-      $resultant_html = self::toHtml($html_dom_with_absolute_urls, $footer_elem_list->item(0));
+      $resultant_html = HeaderFooterExtraction::prepareFooter($html_dom_with_absolute_urls);
     }
     else {
       $resultant_html = self::toHtml($html_dom_with_absolute_urls);
@@ -81,7 +83,7 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    * @param string $scheme_and_host
    *   The root URL, which has a URI scheme, host and optional port.
    *
-   * @return string
+   * @return \DOMDocument
    *   The updated (X)HTML snippet.
    *
    * @see Drupal\Component\Utility\Html::transformRootRelativeUrlsToAbsolute()
