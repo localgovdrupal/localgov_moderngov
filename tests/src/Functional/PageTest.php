@@ -24,7 +24,7 @@ class PageTest extends BrowserTestBase {
    */
   public function testModernGovPage() {
 
-    $this->drupalGet("moderngov-template");
+    $this->drupalGet('moderngov-template');
     $this->assertSession()->statusCodeEquals(200);
 
     // Validate presence of ModernGov tokens.
@@ -44,6 +44,24 @@ class PageTest extends BrowserTestBase {
     $favicon_url_has_hostname = array_key_exists('host', $favicon_url_parts);
     $favicon_url_is_absolute  = $favicon_url_has_hostname;
     $this->assertTrue($favicon_url_is_absolute);
+  }
+
+  /**
+   * Test for empty template.
+   *
+   * The `nocontent` HTTP query parameter produces a variation of the ModernGov
+   * template page with an *empty* main tag.
+   */
+  public function testEmptyContent() {
+
+    $this->drupalGet('moderngov-template', ['query' => ['nocontent' => TRUE]]);
+    $this->assertSession()->statusCodeEquals(200);
+
+    $main_elem_list = $this->cssSelect('main:not([hidden])');
+    $this->assertNotEmpty($main_elem_list);
+
+    $main_elem_children = $this->cssSelect('main:not([hidden]) > *');
+    $this->assertEmpty($main_elem_children);
   }
 
   /**
