@@ -25,6 +25,7 @@ Most sites will need a customized Modern.Gov page template for their themes.  Th
 - Empty page template at /moderngov-template?nocontent: Instead of ModernGov tokens, this template comes with an empty `main` HTML tag.
 - Header template at /moderngov-template?header: Everything inside the `header` HTML tag.  Comes with asset links that preceed the `header` tag.
 - Footer template at /moderngov-template?footer: Everything inside the `footer` HTML tag.  Joined by asset links that follow the `footer` tag.
+- `/moderngov-template?noaggregation`:  This template serves CSS and Javasript files without aggregation.  The `noaggregation` HTTP query parameter can be used with any of the other parameters mentioned above.
 
 ## Maintainers
 
