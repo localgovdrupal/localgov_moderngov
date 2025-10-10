@@ -7,5 +7,9 @@ localgov_moderngov.modern_gov:
     assoc: 1
     depth: 2
     options: 3
+  # These templates are almost always consumed by anonymous users making
+  # BigPipe unnecessary.
+  options:
+    _no_big_pipe: TRUE
   requirements:
     _permission: 'access content'

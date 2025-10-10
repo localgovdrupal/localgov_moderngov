@@ -19,3 +19,17 @@ Most sites will need a customized Modern.Gov page template for their themes.  Th
 ## Good to know
 - [ModernGov test URL](https://reversecms.moderngov.co.uk/).  This sits behind HTTP authentication.
 - Any relative URL embedded within inline Javascript or script tags will *not* be converted to absolute URLs.
+- [BigPipe](https://www.drupal.org/docs/8/core/modules/big-pipe/overview) functionality has been turned off.  This is because this module is concerned about serving templates for anonymous users.  This can be reviewed later if necessary.
+
+## Related templates
+- Empty page template at /moderngov-template?nocontent: Instead of ModernGov tokens, this template comes with an empty `main` HTML tag.
+- Header template at /moderngov-template?header: Everything inside the `header` HTML tag.  Comes with asset links that preceed the `header` tag.
+- Footer template at /moderngov-template?footer: Everything inside the `footer` HTML tag.  Joined by asset links that follow the `footer` tag.
+
+## Maintainers
+
+This project is currently maintained by: 
+
+ - Muhammad Adnan https://www.drupal.org/u/progga
+ - Finn lewis https://www.drupal.org/u/finn-lewis
+ - Alistair Wearring https://github.com/AWearring 
