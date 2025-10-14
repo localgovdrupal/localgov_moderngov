@@ -42,7 +42,7 @@ class HeaderFooterExtraction {
     }
     $header = self::toHtml($html_dom, $header_list->item(0));
 
-    $xpath                 = new \DOMXpath($html_dom);
+    $xpath                 = new \DOMXPath($html_dom);
     $head_scripts_n_styles = self::extractHeadScriptsAndStyles($html_dom, $xpath);
     $other_scripts         = self::extractPreHeaderScripts($html_dom, $xpath);
 
@@ -77,7 +77,7 @@ class HeaderFooterExtraction {
 
     $footer = self::toHtml($html_dom, $footer_list->item(0));
 
-    $xpath = new \DOMXpath($html_dom);
+    $xpath = new \DOMXPath($html_dom);
     $other_scripts = self::extractPostFooterScripts($html_dom, $xpath);
 
     $result = $footer . PHP_EOL . $other_scripts;

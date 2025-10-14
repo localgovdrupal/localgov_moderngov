@@ -33,7 +33,7 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    * Converts all relative URLs to absolute.  Then a few more alterations as
    * mentioned in the class comment above.
    */
-  public function onRespond(ResponseEvent $event) {
+  public function onRespond(ResponseEvent $event): void {
 
     $request = $event->getRequest();
     $has_content_modifier_req = !is_null($request->get('nocontent'));
@@ -90,7 +90,7 @@ class HtmlResponseSubscriber implements EventSubscriberInterface {
    */
   public static function transformRootRelativeUrlsToAbsolute(\DOMDocument $html_dom, $scheme_and_host): \DOMDocument {
 
-    $xpath = new \DOMXpath($html_dom);
+    $xpath = new \DOMXPath($html_dom);
 
     $uriAttributes = [
       'href', 'poster', 'src', 'cite', 'data',

@@ -29,7 +29,7 @@ class ConfigOverrider implements ConfigFactoryOverrideInterface {
     $is_moderngov_tpl = $this->requestStack->getCurrentRequest()->get('_route') === 'localgov_moderngov.modern_gov';
     $has_noaggregation_requirement = !is_null($this->requestStack->getCurrentRequest()->get('noaggregation'));
 
-    if ($is_moderngov_tpl && $has_noaggregation_requirement && in_array('system.performance', $names)) {
+    if ($is_moderngov_tpl && $has_noaggregation_requirement && in_array('system.performance', $names, TRUE)) {
       $overrides['system.performance']['css']['preprocess'] = FALSE;
       $overrides['system.performance']['js']['preprocess']  = FALSE;
     }
