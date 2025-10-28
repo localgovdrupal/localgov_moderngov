@@ -3,3 +3,9 @@ services:
     class: Drupal\localgov_moderngov\EventSubscriber\HtmlResponseSubscriber
     tags:
       - { name: event_subscriber }
+
+  localgov_moderngov.config_overrider:
+    class: Drupal\localgov_moderngov\ConfigOverrider
+    arguments: ['@request_stack']
+    tags:
+      - { name: config.factory.override }

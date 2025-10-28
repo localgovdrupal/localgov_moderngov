@@ -22,7 +22,7 @@ class PageTest extends BrowserTestBase {
    * - Presence of tokens within the Modern.Gov template page.
    * - Absolute asset URLs.
    */
-  public function testModernGovPage() {
+  public function testModernGovPage(): void {
 
     $this->drupalGet('moderngov-template');
     $this->assertSession()->statusCodeEquals(200);
@@ -52,7 +52,7 @@ class PageTest extends BrowserTestBase {
    * The `nocontent` HTTP query parameter produces a variation of the ModernGov
    * template page with an *empty* main tag.
    */
-  public function testEmptyContent() {
+  public function testEmptyContent(): void {
 
     $this->drupalGet('moderngov-template', ['query' => ['nocontent' => TRUE]]);
     $this->assertSession()->statusCodeEquals(200);
